@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>simple3d</title>
+    </head>
+    <body>
+        <!-- Description -->
+        <h1>simple3d</h1>
+        <p>A simple software 3D model renderer</p>
+       
+        <div style="display: flex">
+            <!-- Vertical slider -->
+            <input type="range" min="0" max="360" value="0" style="writing-mode: vertical-lr; height: 800px" id="verticalSlider"></input>
+            
+            <div style="width: 800px">
+                <!-- Canvas for drawing to -->
+                <canvas id="canvas"></canvas>
+
+                <!-- Horizontal slider -->
+                <input type="range" min="0" max="360" value="0" style="width: 800px" id="horizontalSlider"></input>
+            </div>
+        </div>
+
+        <!-- Rendering options -->
+        <label for="showVerticies">
+            <input type="checkbox" id="showVerticies" name="showVerticies" value="yes">Show verticies
+        </label>
+        <br>
+        <label for="showFaces">
+            <input type="checkbox" id="showFaces" name="showFaces" value="yes">Show faces
+        </label>
+        <br>
+    
+        <label for="spinSpeed">
+            <input type="range" min="0" max="100" value="1" id="spinSpeed"></input> Spin speed
+        </label>
+
+        <!-- Javascript code -->
+        <script src="simple3d.js"></script>
+    </body>
+</html>
