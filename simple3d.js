@@ -1,4 +1,4 @@
-class Object3D {
+class WavefontObj {
     #verticies;
     #faces;
 
@@ -70,11 +70,8 @@ class Object3D {
 class Canvas {
     // Frames per second
     static FPS = 60;
-    // Size
-    static WIDTH = 800;
-    static HEIGHT = 800;
     // Default colors
-    static BACKGROUND = "#000000";
+    static BACKGROUND = "#0a0a0a";
     static FOREGROUND = "#00ff00";
 
     #canvas;
@@ -83,17 +80,18 @@ class Canvas {
     constructor() {
         // Setup the canvas
         this.#canvas = document.getElementById("canvas");
-        this.#canvas.width = Canvas.WIDTH;
-        this.#canvas.height = Canvas.HEIGHT;
-
         // Get a 2D context to draw onto the canvas
         this.#context = this.#canvas.getContext("2d");
+        // Add an event listener to handle window resizes
+        window.addEventListener("resize", () => {
+            this.#canvas.width = window.innerWidth;
+            this.#canvas.height = window.innerHeight;
+        });
     }
 
     clear(color) {
         // Set the draw color
         this.#context.fillStyle = color;
-
         // Draw a rectangle that fills the screen to mimic a clear
         this.#context.fillRect(0, 0, this.#canvas.width, this.#canvas.height);
     }
@@ -101,7 +99,6 @@ class Canvas {
     drawPoint({x, y}, color) {
         // Set the draw color
         this.#context.fillStyle = color; 
-
         // Draw the point
         this.#context.fillRect(x, y, 5, 5);
     }
@@ -110,12 +107,19 @@ class Canvas {
         // Set the line properties and then draw the line
         this.#context.lineWidth = 5;
         this.#context.strokeStyle = color;
-
         // Draw the line
         this.#context.beginPath();
         this.#context.moveTo(v1.x, v1.y);
         this.#context.lineTo(v2.x, v2.y);
         this.#context.stroke();
+    }
+
+    getWidth() {
+        return this.#canvas.width;
+    }
+
+    getHeight() {
+        return this.#canvas.height;
     }
 }
 
@@ -133,16 +137,16 @@ class Simple3D {
         // Add event listeners for object position
         const offsetX = document.getElementById("xSlider");
         offsetX.addEventListener("input", () => {
-            this.#offset.x = (offsetX.value / Canvas.WIDTH) * 2 - 1;
+            this.#offset.x = (offsetX.value / this.#canvas.getWidth()) * 2 - 1;
         });
         const offsetY = document.getElementById("ySlider");
         offsetY.addEventListener("input", () => {
-            this.#offset.y = 1 - (2 * offsetY.value) / Canvas.HEIGHT;
+            this.#offset.y = 1 - (2 * offsetY.value) / this.#canvas.getHeight();
         });
-        const offsetZ = document.getElementById("zSlider");
+        /*const offsetZ = document.getElementById("zSlider");
         offsetZ.addEventListener("input", () => {
             this.#offset.z = offsetZ.value / 800;
-        });
+        });*/
         // Add event listeners for object view properties
         const showVerticies = document.getElementById("showVerticies");
         showVerticies.addEventListener("change", () => {
@@ -162,7 +166,7 @@ class Simple3D {
             const objFile = objInput.files[0];
             const reader = new FileReader();
             reader.onload = () => {
-                this.#object = new Object3D(reader.result);
+                this.#object = new WavefontObj(reader.result);
             };
             reader.readAsText(objFile);
         });
@@ -170,7 +174,7 @@ class Simple3D {
         // Setup the canvas
         this.#canvas = new Canvas();
         // Load the object
-        this.#object = new Object3D("");
+        this.#object = new WavefontObj("");
         // Object view properties
         this.#showVerticies = showVerticies.checked;
         this.#showFaces = showFaces.checked;
@@ -239,8 +243,8 @@ class Simple3D {
     #toScreenCoords({x, y}) {
         // Convert normalised coordinates to screen coordinates
         return {
-            x: (x + 1) / 2 * Canvas.WIDTH,
-            y: (1 - (y + 1) / 2) * Canvas.HEIGHT
+            x: (x + 1) / 2 * this.#canvas.getWidth(),
+            y: (1 - (y + 1) / 2) * this.#canvas.getHeight()
         };
     }
 
