@@ -3,9 +3,36 @@ class WavefontObj {
     #faces;
 
     constructor(data) {
+        if (data == null) {
+            // Object vertex data
+            this.#verticies = [
+                {x: 0.25, y: 0.25, z: 0.25},
+                {x: -0.25, y: 0.25, z: 0.25},
+                {x: -0.25, y: -0.25, z: 0.25},
+                {x: 0.25, y: -0.25, z: 0.25},
+
+                {x: 0.25, y: 0.25, z: -0.25},
+                {x: -0.25, y: 0.25, z: -0.25},
+                {x: -0.25, y: -0.25, z: -0.25},
+                {x: 0.25, y: -0.25, z: -0.25},
+            ];
+
+            // Object face data
+            this.#faces = [
+                [0, 1, 2, 3],
+                [4, 5, 6, 7],
+                [0, 4],
+                [1, 5],
+                [2, 6],
+                [3, 7]
+            ];
+        
+            return;
+        }
+
         this.#verticies = [];
         this.#faces = [];
-
+       
         // Tokenise the file (kinda bad way of doing it :^))
         const tokens = data.split("\n").map((a) => a.split(" ")).flat();
 
@@ -28,34 +55,6 @@ class WavefontObj {
                 ]);
             }
         }
-
-        console.log(this.#verticies);
-        console.log(this.#faces);
-
-        // Object vertex data
-/*        this.#verticies = [
-            {x: 0.25, y: 0.25, z: 0.25},
-            {x: -0.25, y: 0.25, z: 0.25},
-            {x: -0.25, y: -0.25, z: 0.25},
-            {x: 0.25, y: -0.25, z: 0.25},
-
-            {x: 0.25, y: 0.25, z: -0.25},
-            {x: -0.25, y: 0.25, z: -0.25},
-            {x: -0.25, y: -0.25, z: -0.25},
-            {x: 0.25, y: -0.25, z: -0.25},
-        ];
-
-        // Object face data
-        this.#faces = [
-            [0, 1, 2, 3],
-            [4, 5, 6, 7],
-            [0, 4],
-            [1, 5],
-            [2, 6],
-            [3, 7]
-        ];
-
-        console.log(data);*/
     }
 
     getVerticies() {
@@ -143,10 +142,10 @@ class Simple3D {
         offsetY.addEventListener("input", () => {
             this.#offset.y = 1 - (2 * offsetY.value) / this.#canvas.getHeight();
         });
-        /*const offsetZ = document.getElementById("zSlider");
+        const offsetZ = document.getElementById("zSlider");
         offsetZ.addEventListener("input", () => {
             this.#offset.z = offsetZ.value / 800;
-        });*/
+        });
         // Add event listeners for object view properties
         const showVerticies = document.getElementById("showVerticies");
         showVerticies.addEventListener("change", () => {
@@ -174,7 +173,7 @@ class Simple3D {
         // Setup the canvas
         this.#canvas = new Canvas();
         // Load the object
-        this.#object = new WavefontObj("");
+        this.#object = new WavefontObj(null);
         // Object view properties
         this.#showVerticies = showVerticies.checked;
         this.#showFaces = showFaces.checked;
