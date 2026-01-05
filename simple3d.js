@@ -2,9 +2,27 @@ class Object3D {
     #verticies;
     #faces;
 
-    constructor() {
+    constructor(data) {
+        this.#verticies = [];
+        this.#faces = [];
+
+        const tokens = data.split("\n").map((a) => a.split(" ")).flat();
+        for (let i = 0; i < tokens.length; i++) {
+            if (tokens[i] == "v" && i + 3 < tokens.length) {
+                this.#verticies.push({
+                    x: parseFloat(tokens[i + 1]),
+                    y: parseFloat(tokens[i + 2]),
+                    z: parseFloat(tokens[i + 3])
+                });
+            }
+        }
+
+        console.log(this.#verticies);
+        
+        // Load verticies
+
         // Object vertex data
-        this.#verticies = [
+/*        this.#verticies = [
             {x: 0.25, y: 0.25, z: 0.25},
             {x: -0.25, y: 0.25, z: 0.25},
             {x: -0.25, y: -0.25, z: 0.25},
@@ -25,6 +43,8 @@ class Object3D {
             [2, 6],
             [3, 7]
         ];
+
+        console.log(data);*/
     }
 
     getVerticies() {
@@ -114,9 +134,18 @@ class Simple3D {
             this.#spinSpeed = spinSpeed.value;
         });
         this.#spinSpeed = spinSpeed.value;
+        const objInput = document.getElementById("objInput");
+        objInput.addEventListener("change", () => {
+            const objFile = objInput.files[0];
+            const reader = new FileReader();
+            reader.onload = () => {
+                this.#object = new Object3D(reader.result);
+            };
+            reader.readAsText(objFile);
+        });
 
         // Load the object
-        this.#object = new Object3D();
+        this.#object = new Object3D("");
 
         // Object view properties
         this.#deltaZ = 1;
