@@ -11,15 +11,18 @@
         <p>A simple software 3D model renderer</p>
        
         <div style="display: flex">
-            <!-- Vertical slider -->
-            <input type="range" min="0" max="360" value="0" style="writing-mode: vertical-lr; height: 800px" id="verticalSlider"></input>
+            <!-- Y axis slider -->
+            <input type="range" min="0" max="800" value="0" style="writing-mode: vertical-lr; height: 800px" id="ySlider">
             
-            <div style="width: 800px">
+            <div style="width: 840px">
                 <!-- Canvas for drawing to -->
                 <canvas id="canvas"></canvas>
 
-                <!-- Horizontal slider -->
-                <input type="range" min="0" max="360" value="0" style="width: 800px" id="horizontalSlider"></input>
+                <!-- Z axis slider -->
+                <input type="range" min="0" max="800" value="0" style="writing-mode: vertical-lr; height: 800px" id="zSlider">
+ 
+                <!-- X axis slider -->
+                <input type="range" min="0" max="800" value="0" style="width: 800px" id="xSlider">
             </div>
         </div>
 
@@ -34,7 +37,7 @@
         <br>
     
         <label for="spinSpeed">
-            <input type="range" min="0" max="100" value="1" id="spinSpeed"></input> Spin speed
+            <input type="range" min="0" max="100" value="1" id="spinSpeed"> Spin speed
         </label>
 
         <br>

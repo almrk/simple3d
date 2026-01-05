@@ -6,20 +6,31 @@ class Object3D {
         this.#verticies = [];
         this.#faces = [];
 
+        // Tokenise the file (kinda bad way of doing it :^))
         const tokens = data.split("\n").map((a) => a.split(" ")).flat();
+
+        // Load the vertices and faces
         for (let i = 0; i < tokens.length; i++) {
-            if (tokens[i] == "v" && i + 3 < tokens.length) {
+            if (i + 3 >= tokens.length)
+                break;
+
+            if (tokens[i] == "v") {
                 this.#verticies.push({
                     x: parseFloat(tokens[i + 1]),
                     y: parseFloat(tokens[i + 2]),
                     z: parseFloat(tokens[i + 3])
                 });
+            } else if (tokens[i] == "f") {
+                this.#faces.push([
+                    parseFloat(tokens[i + 1]),
+                    parseFloat(tokens[i + 2]),
+                    parseFloat(tokens[i + 3])
+                ]);
             }
         }
 
         console.log(this.#verticies);
-        
-        // Load verticies
+        console.log(this.#faces);
 
         // Object vertex data
 /*        this.#verticies = [
@@ -59,6 +70,9 @@ class Object3D {
 class Canvas {
     // Frames per second
     static FPS = 60;
+    // Size
+    static WIDTH = 800;
+    static HEIGHT = 800;
     // Default colors
     static BACKGROUND = "#000000";
     static FOREGROUND = "#00ff00";
@@ -69,8 +83,8 @@ class Canvas {
     constructor() {
         // Setup the canvas
         this.#canvas = document.getElementById("canvas");
-        this.#canvas.width = 800;
-        this.#canvas.height = 800;
+        this.#canvas.width = Canvas.WIDTH;
+        this.#canvas.height = Canvas.HEIGHT;
 
         // Get a 2D context to draw onto the canvas
         this.#context = this.#canvas.getContext("2d");
@@ -89,7 +103,7 @@ class Canvas {
         this.#context.fillStyle = color; 
 
         // Draw the point
-        this.#context.fillRect(x, y, 10, 10);
+        this.#context.fillRect(x, y, 5, 5);
     }
 
     drawLine(v1, v2, color) {
@@ -113,27 +127,36 @@ class Simple3D {
     #object;
     #deltaZ;
     #angle;
+    #offset;
 
     constructor() {
-        // Setup the canvas
-        this.#canvas = new Canvas();
-
-        // Add event listeners
+        // Add event listeners for object position
+        const offsetX = document.getElementById("xSlider");
+        offsetX.addEventListener("input", () => {
+            this.#offset.x = (offsetX.value / Canvas.WIDTH) * 2 - 1;
+        });
+        const offsetY = document.getElementById("ySlider");
+        offsetY.addEventListener("input", () => {
+            this.#offset.y = 1 - (2 * offsetY.value) / Canvas.HEIGHT;
+        });
+        const offsetZ = document.getElementById("zSlider");
+        offsetZ.addEventListener("input", () => {
+            this.#offset.z = offsetZ.value / 800;
+        });
+        // Add event listeners for object view properties
         const showVerticies = document.getElementById("showVerticies");
         showVerticies.addEventListener("change", () => {
             this.#showVerticies = showVerticies.checked;
         });
-        this.#showVerticies = showVerticies.checked;
         const showFaces = document.getElementById("showFaces");
         showFaces.addEventListener("change", () => {
             this.#showFaces = showFaces.checked;
         });
-        this.#showFaces = showFaces.checked;
         const spinSpeed = document.getElementById("spinSpeed");
         spinSpeed.addEventListener("input", () => {
             this.#spinSpeed = spinSpeed.value;
         });
-        this.#spinSpeed = spinSpeed.value;
+        // Add event listener for file handling
         const objInput = document.getElementById("objInput");
         objInput.addEventListener("change", () => {
             const objFile = objInput.files[0];
@@ -144,12 +167,21 @@ class Simple3D {
             reader.readAsText(objFile);
         });
 
+        // Setup the canvas
+        this.#canvas = new Canvas();
         // Load the object
         this.#object = new Object3D("");
-
         // Object view properties
+        this.#showVerticies = showVerticies.checked;
+        this.#showFaces = showFaces.checked;
+        this.#spinSpeed = spinSpeed.value;
         this.#deltaZ = 1;
         this.#angle = 0;
+        this.#offset = {
+            x: 0,
+            y: 0,
+            z: 0
+        };
     }
    
     render() {
@@ -195,19 +227,20 @@ class Simple3D {
     #calculatePoint(v, angle, dz) {
         // Convert the 3D coordinates to screen coordinates
         const vRot = this.#rotateXZ(v, angle);
-        const vTZ = this.#translateZ(vRot, dz);
-        const v2D = this.#to2DCoords(vTZ);
+        const vTZ = this.#addVector(vRot, {x: 0, y: 0, z: dz});
+        const vOff = this.#addVector(vTZ, this.#offset);
+        const v2D = this.#to2DCoords(vOff);
         const result = this.#toScreenCoords(v2D);
 
         // Return the result
         return result;
     }
 
-    #toScreenCoords(v) {
+    #toScreenCoords({x, y}) {
         // Convert normalised coordinates to screen coordinates
         return {
-            x: (v.x + 1) / 2 * canvas.width,
-            y: (1 - (v.y + 1) / 2) * canvas.height
+            x: (x + 1) / 2 * Canvas.WIDTH,
+            y: (1 - (y + 1) / 2) * Canvas.HEIGHT
         };
     }
 
@@ -219,12 +252,11 @@ class Simple3D {
         };
     }
 
-    #translateZ({x, y, z}, dz) {
-        // Offset the Z by the delta of Z
+    #addVector(v1, v2) {
         return {
-            x: x,
-            y: y,
-            z: z + dz
+            x: v1.x + v2.x,
+            y: v1.y + v2.y,
+            z: v1.z + v2.z 
         };
     }
 
@@ -256,15 +288,6 @@ class Simple3D {
             y: (x * sin) + (y * cos),
             z: z
         };
-    }
-
-    #getCheckbox(name) {
-        return document.querySelector(`#${name}:checked`) !== null;
-    }
-
-    #getSlider(name) {
-        document.querySelector(`#${name}:range`);
-        return;
     }
 }
 
